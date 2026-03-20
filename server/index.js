@@ -2,19 +2,20 @@ import express from "express";
 import cors from "cors";
 import bcrypt from "bcryptjs";
 import db from "./db.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:5173",
-      "https://your-frontend.vercel.app"
-    ],
-    credentials: true,
-  })
-);
+
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://fullstack-auth-ixvgar7b0-nandakishore927s-projects.vercel.app"
+  ],
+  credentials: true
+}));
 
 // Register
 app.post("/register", async (req, res) => {
@@ -54,5 +55,16 @@ app.post("/login", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+// Home route
+app.get("/home", (req, res) => {
+  res.json({ username: "User" });
+});
+
+// Logout route
+app.post("/logout", (req, res) => {
+  res.json({ message: "Logout successful" });
+});
+
 const PORT = process.env.PORT || 5731;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
