@@ -20,18 +20,41 @@ app.use(cors({
 // Register
 app.post("/register", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    if (!username || !email || !password) return res.status(400).json({ message: "All fields required" });
+    console.log("REGISTER HIT");
 
-    const [existingUser] = await db.query("SELECT * FROM users WHERE username = ?", [username]);
-    if (existingUser.length > 0) return res.status(409).json({ message: "User already exists" });
+    const { username, email, password } = req.body;
+
+    if (!username || !email || !password) {
+      console.log("Missing fields");
+      return res.status(400).json({ message: "All fields required" });
+    }
+
+    const [existingUser] = await db.query(
+      "SELECT * FROM users WHERE username = ?",
+      [username]
+    );
+
+    console.log("Checked existing user");
+
+    if (existingUser.length > 0) {
+      return res.status(409).json({ message: "User already exists" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    await db.query("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [username, email, hashedPassword]);
+
+    console.log("Password hashed");
+
+    const result = await db.query(
+      "INSERT INTO users (username, email, password) VALUES (?, ?, ?)",
+      [username, email, hashedPassword]
+    );
+
+    console.log("Inserted user:", result);
 
     res.status(201).json({ message: "User registered successfully" });
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ REGISTER ERROR:", err); // 👈 VERY IMPORTANT
     res.status(500).json({ message: "Server error" });
   }
 });
